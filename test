@@ -1,1 +1,47 @@
-test
+% Read an image
+originalImage = imread('your_image.jpg'); % Replace with the path to your image
+originalImage = rgb2gray(originalImage); % Convert to grayscale if RGB
+
+% Display the original image
+figure;
+subplot(2, 3, 1);
+imshow(originalImage);
+title('Original Image');
+
+% 2D Fourier Transform
+fftImage = fft2(double(originalImage));
+
+% Display the magnitude spectrum of the Fourier Transform
+magnitudeSpectrum = log(1 + abs(fftshift(fftImage)));
+subplot(2, 3, 2);
+imshow(magnitudeSpectrum, []);
+title('Magnitude Spectrum');
+
+% Apply a simple mask (e.g., a high-pass filter)
+mask = ones(size(fftImage));
+maskSize = 30;
+mask(end/2-maskSize:end/2+maskSize, end/2-maskSize:end/2+maskSize) = 0;
+filteredImage = fftImage .* mask;
+
+% Display the masked magnitude spectrum
+filteredMagnitude = log(1 + abs(fftshift(filteredImage)));
+subplot(2, 3, 3);
+imshow(filteredMagnitude, []);
+title('Masked Magnitude Spectrum');
+
+% Compute the inverse Fourier transform to get the filtered image
+reconstructedImage = real(ifft2(filteredImage));
+
+% Display the reconstructed image
+subplot(2, 3, 4);
+imshow(uint8(reconstructedImage));
+title('Reconstructed Image');
+
+% 1D Fourier Transform of a row
+rowIndex = round(size(originalImage, 1) / 2);
+oneDFFT = fft(double(originalImage(rowIndex, :)));
+
+% Display the magnitude of the 1D FFT
+subplot(2, 3, 5);
+plot(abs(oneDFFT));
+title('1D FFT Magnitude Spectrum');
